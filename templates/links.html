@@ -1,39 +1,56 @@
-<!doctype html>
-<html
-  xmlns:th="https://www.thymeleaf.org"
-  th:replace="~{modules/layout :: html(title = '链接 - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
->
-  <th:block th:fragment="content">
-    <div class="rounded-xl bg-white p-4 dark:bg-slate-800">
-      <h1 class="mb-3 text-2xl font-medium dark:text-slate-50">链接</h1>
-      <div class="flex flex-col gap-4">
-        <th:block th:each="group : ${groups}">
-          <h2 class="mt-2 text-lg font-medium dark:text-slate-50" th:text="${group.spec.displayName}"></h2>
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <a th:each="link : ${group.links}" th:href="${link.spec.url}" target="_blank">
-              <div
-                class="relative flex items-center space-x-3 rounded border border-gray-300 bg-white px-5 py-4 shadow-sm hover:border-gray-400 hover:shadow dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-700"
-              >
-                <div class="flex-shrink-0">
-                  <img class="size-12 rounded-full" th:src="${link.spec.logo}" th:alt="${link.spec.displayName}" />
+<!DOCTYPE html>
+<th:block xmlns:th="https://www.thymeleaf.org"
+          th:insert="~{common/layout :: layout (title = '友链 - ' + ${site.title}, canonical = @{/links}, content = ~{::content}, isPost = false)}"
+          th:with="baseEnableComment = ${!#strings.isEmpty(theme.config.page_config.link_comment_id) && theme.config.page_config.link_enable_comment}">
+    <th:block th:fragment="content"
+              th:with="defaultAvatar = ${#strings.defaultString(theme.config.page_config.links_default_avatar, #theme.assets('/img/avatar.svg'))}">
+        <div class="card">
+            <div th:if="${!#strings.isEmpty(theme.config.page_config.links_thumbnail)}" class="card-image cover-image" th:style="'background-image: url(' + ${theme.config.page_config.links_thumbnail} + ')'">
+            </div>
+            <div class="card-content main">
+                <h1 class="title" th:text="'友情链接 - ' + ${contributor.displayName} + '的小伙伴们'"></h1>
+                <div class="main-content">
+                    <th:block th:each="group : ${groups}">
+                        <div th:if="${!#lists.isEmpty(group.links)}" class="links">
+                            <h3 class="link-title" th:text="${#strings.defaultString(group.spec.displayName, '小伙伴们')}" th:id="'toc' + ${groupStat.index}"></h3>
+                            <ul class="link-items">
+                                <li th:each="link : ${group.links}">
+                                    <a class="links-item" th:href="${link.spec.url}" rel="noopener noreferrer" target="_blank"
+                                       th:title="${link.spec.description}">
+                                        <img th:if="${#strings.isEmpty(link.spec.logo)}" class="not-gallery" th:title="${link.spec.displayName}" th:src="${defaultAvatar}" th:alt="${link.spec.displayName}">
+                                        <img th:unless="${#strings.isEmpty(link.spec.logo)}" class="not-gallery" th:title="${link.spec.displayName}" th:src="${defaultAvatar}"
+                                             th:data-url="${link.spec.logo}"
+                                             th:data-default="${defaultAvatar}"
+                                             onload="if(!this.finish){this.finish=true;this.src=this.getAttribute('data-url')}"
+                                             onerror="this.onerror='';if (this.finish) {this.src=this.getAttribute('data-default')} else {this.finish=true;this.src=this.getAttribute('data-url')}"
+                                             th:alt="${link.spec.displayName}">
+                                        <span class="link-name" th:text="${link.spec.displayName}"></span>
+                                        <div class="link-desc" th:text="${#strings.defaultString(link.spec.description, '他还没有自我介绍呢')}"></div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </th:block>
+                    <hr th:if="${theme.config.page_config.show_exchange_info || !#strings.isEmpty(theme.config.page_config.links_info)}"/>
+                    <th:block th:if="${theme.config.page_config.show_exchange_info}"
+                              th:with="bloggerAvatar= ${#strings.defaultString(theme.config.page_config.links_blogger_avatar, contributor.avatar)}">
+                        申请友链的方法：
+                        <ul>
+                            <li>名称：[[${site.title}]]</li>
+                            <li>地址：<a th:href="${site.url}" th:text="${site.url}"></a></li>
+                            <li>图标：<a th:href="${bloggerAvatar}" th:text="${bloggerAvatar}"></a></li>
+                            <li>描述：[[${contributor.bio}]]</li>
+                        </ul>
+                    </th:block>
+                    <div th:if="${!#strings.isEmpty(theme.config.page_config.links_info)}" th:utext="${theme.config.page_config.links_info}"></div>
                 </div>
-                <div class="min-w-0 flex-1">
-                  <div>
-                    <p
-                      class="truncate text-sm font-medium text-gray-900 dark:text-slate-100"
-                      th:text="${link.spec.displayName}"
-                    ></p>
-                    <p
-                      class="truncate text-sm text-gray-500 dark:text-slate-400"
-                      th:text="${link.spec.description}"
-                    ></p>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-        </th:block>
-      </div>
-    </div>
-  </th:block>
-</html>
+            </div>
+        </div>
+        <div class="card card-content" id="comment-wrapper" th:if="${enableComment}">
+            <h3 class="comment-title">评论</h3>
+            <div th:if="${haloCommentEnabled}">
+                <halo:comment group="content.halo.run" kind="SinglePage" th:attr="name=${theme.config.page_config.link_comment_id}"/>
+            </div>
+        </div>
+    </th:block>
+</th:block>
