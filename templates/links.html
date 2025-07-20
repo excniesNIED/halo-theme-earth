@@ -10,12 +10,12 @@
         <th:block th:each="group : ${groups}">
           <h2 class="mt-2 text-lg font-medium dark:text-slate-50" th:text="${group.spec.displayName}"></h2>
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <a th:each="link : ${group.links}" th:href="${link.spec.url}" target="_blank">
+            <a th:each="link : ${group.links}" th:href="${link.spec.url}" target="_blank" class="group">
               <div
-                class="relative flex items-center space-x-3 rounded border border-gray-300 bg-white px-5 py-4 shadow-sm hover:border-gray-400 hover:shadow dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-700"
+                class="relative flex items-center space-x-3 rounded-xl border border-gray-300 bg-white px-5 py-4 shadow-md transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:ring-2 ring-black dark:border-slate-600 dark:bg-slate-700 dark:ring-slate-700"
               >
                 <div class="flex-shrink-0">
-                  <img class="size-12 rounded-full" th:src="${link.spec.logo}" th:alt="${link.spec.displayName}" />
+                  <img class="size-12 rounded-full transition-all duration-500 group-hover:scale-105" th:src="${link.spec.logo}" th:alt="${link.spec.displayName}" />
                 </div>
                 <div class="min-w-0 flex-1">
                   <div>
